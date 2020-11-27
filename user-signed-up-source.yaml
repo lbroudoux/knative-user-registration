@@ -1,0 +1,31 @@
+apiVersion: sources.knative.dev/v1beta1
+kind: KafkaSource
+metadata:
+  name: kafka-source
+  labels:
+    app: "kafka-source"
+    app.kubernetes.io/component: "kafka-source"
+    app.kubernetes.io/instance: "kafka-source"
+    app.kubernetes.io/part-of: "strimzi-my-cluster"
+spec:
+  consumerGroup: knative-group
+  bootstrapServers: 
+    - my-cluster-kafka-bootstrap.user-registration-serverless.svc:9092
+  topics:
+    - user-signed-up
+  net:
+    sasl:
+      user: {}
+      password: {}
+    tls:
+      caCert: {}
+      cert: {}
+      key: {}
+  sink: 
+   ref:
+    apiVersion: messaging.knative.dev/v1beta1
+    kind: Channel
+    name: channel
+    #apiVersion: serving.knative.dev/v1
+    #kind: Service
+    #name: event-display

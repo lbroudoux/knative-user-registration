@@ -1,0 +1,17 @@
+apiVersion: messaging.knative.dev/v1
+kind: Channel
+metadata:
+  annotations:
+    messaging.knative.dev/creator: opentlc-mgr
+    messaging.knative.dev/lastModifier: opentlc-mgr
+    messaging.knative.dev/subscribable: v1
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: channel
+  labels:
+    app: channel
+    app.kubernetes.io/component: channel
+    app.kubernetes.io/instance: channel
+spec:
+  channelTemplate:
+    apiVersion: messaging.knative.dev/v1beta1
+    kind: InMemoryChannel
