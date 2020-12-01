@@ -89,7 +89,7 @@ $ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullNa
 }
 ```
 
-With got `v1` responses so far with just 4 properties in the response. Deploy version `v2` that adds a new property and send events to Kafka. Do not put traffic on this new revision.
+We've got `v1` responses so far with just 4 properties in the response. Deploy version `v2` that adds a new property and send events to Kafka. Do not put traffic on this new revision.
 
 ```sh
 $ kn service update user-registration --image quay.io/microcks/quarkus-user-registration:latest --traffic @latest=0 --traffic v1=100
