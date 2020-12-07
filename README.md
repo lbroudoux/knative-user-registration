@@ -189,7 +189,7 @@ Create `Subscriptions` to bind the `Channel` to our consumers. You can do that u
 
 ```sh
 oc create -f event-display-subscription.yml -n user-registration-serverless
-oc create -f user-registration-consumer-subcription.yml -n user-registration-serverless
+oc create -f user-registration-consumer-subscription.yml -n user-registration-serverless
 ```
 
 Now it's time to demonstrate everything altogether! Be sure that you waited long enough so that there's no pod still running on the dofferent microservices. You should have something like that:
