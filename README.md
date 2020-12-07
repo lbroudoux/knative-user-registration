@@ -20,6 +20,8 @@ So you should have an OpenShift 4.6+ cluster (or a Kubernetes one but it's trick
 * Strimzi.io Operator up and running for providing a Kafka broker to the app,
 * Knative Serving and Eventing installed.
 
+> If using OpenShift 4.5, be sure to install the OpenShift Serverless Operator using the latest `4.6` channel. Otherwise the CRD installed into the cluster won't have the correct API versions.
+
 You should also have the `kn` CLI tool available on your laptop or bastion server:
 
 ```sh
