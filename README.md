@@ -188,7 +188,7 @@ $ kn service create event-display --image gcr.io/knative-releases/knative.dev/ev
 Create `Subscriptions` to bind the `Channel` to our consumers. You can do that using the OpenShift Console DEveloper UI by drag-n-dropping connections between the `Channel` and the Knative Services or with this commands:
 
 ```sh
-oc create -f event-display-subcription.yml -n user-registration-serverless
+oc create -f event-display-subscription.yml -n user-registration-serverless
 oc create -f user-registration-consumer-subcription.yml -n user-registration-serverless
 ```
 
