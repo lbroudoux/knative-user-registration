@@ -15,12 +15,12 @@ In the demonstration scenario, we are going to deploy 2 differents revisions of 
 
 ### Setup
 
-> This current version of the demo was updated for OpenShift 4.9+ cluster. It was initially created at OpenShift 4.5+/4.6 time. It you're running an older version, please navigate to the `/openshift-4.6` folder where you'll find previous version of this README.
-
-So you should have an OpenShift 4.9+ cluster (or a Kubernetes one but it's trickier to setup) with the different features enabled:
+So you should have an OpenShift 4.6+ cluster (or a Kubernetes one but it's trickier to setup) with the different features enabled:
 
 * Strimzi.io Operator up and running for providing a Kafka broker to the app,
-* Knative Serving and Eventing installed and deployed in their own namespaces, as well as a `KnativeKafka` resource created in `knative-eventing` with `spec.source.enabled` set to `true`
+* Knative Serving and Eventing installed.
+
+> If using OpenShift 4.5, be sure to install the OpenShift Serverless Operator using the latest `4.6` channel. Otherwise the CRD installed into the cluster won't have the correct API versions.
 
 You should also have the `kn` CLI tool available on your laptop or bastion server:
 
@@ -82,9 +82,9 @@ $ export APP_URL=`oc get ksvc user-registration -o json -n user-registration-ser
 Play with App through CURL command, registering new users and see the Pods scaling-up and down:
 
 ```sh
-$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":43}' -s | jq .
+$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":41}' -s | jq .
 {
-  "age": 43,
+  "age": 41,
   "email": "laurent.broudoux@gmail.com",
   "fullName": "Laurent Broudoux",
   "id": "c637a5f8-ecfe-45be-b44d-69bf08043603"
@@ -124,9 +124,9 @@ You can retrieve the specific `v2` url and check everything is fine:
 ```sh
 $ export APP_V2_URL=`oc get ksvc user-registration -o json -n user-registration-serverless | jq -r '.status.traffic[1].url'`
 
-$ curl -XPOST $APP_V2_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":43}' -s | jq .
+$ curl -XPOST $APP_V2_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":41}' -s | jq .
 {
-  "age": 43,
+  "age": 41,
   "email": "laurent.broudoux@gmail.com",
   "fullName": "Laurent Broudoux",
   "id": "a34d49f4-5332-4919-bd00-35089af32ee4",
@@ -137,9 +137,9 @@ $ curl -XPOST $APP_V2_URL/register -H 'Content-type: application/json' -d '{"ful
 Now that you're happy, move traffic from `v1` to `v2`
 
 ```sh
-$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":43}' -s | jq .
+$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":41}' -s | jq .
 {
-  "age": 43,
+  "age": 41,
   "email": "laurent.broudoux@gmail.com",
   "fullName": "Laurent Broudoux",
   "id": "bba6e464-4cb3-4361-ad20-0e3294bdb00f"
@@ -156,9 +156,9 @@ Updating Service 'user-registration' in namespace 'user-registration-serverless'
 Service 'user-registration' with latest revision 'user-registration-mwmrh-3' (unchanged) is available at URL:
 http://user-registration-user-registration-serverless.apps.cluster-7eee.7eee.example.opentlc.com
 
-$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":43}' -s | jq .
+$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":41}' -s | jq .
 {
-  "age": 43,
+  "age": 41,
   "email": "laurent.broudoux@gmail.com",
   "fullName": "Laurent Broudoux",
   "id": "fafc43d4-46e3-4595-b5d5-e17f31ae3fac",
@@ -187,23 +187,23 @@ Deploy some other consumer...
 $ kn service create event-display --image gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
 ```
 
-Create `Subscriptions` to bind the `Channel` to our consumers. You can do that using the OpenShift Console Developer UI by drag-n-dropping connections between the `Channel` and the Knative Services or with this commands:
+Create `Subscriptions` to bind the `Channel` to our consumers. You can do that using the OpenShift Console DEveloper UI by drag-n-dropping connections between the `Channel` and the Knative Services or with this commands:
 
 ```sh
 oc create -f event-display-subscription.yml -n user-registration-serverless
 oc create -f user-registration-consumer-subscription.yml -n user-registration-serverless
 ```
 
-Now it's time to demonstrate everything altogether! Be sure that you waited long enough so that there's no pod still running on the different microservices. You should have something like that:
+Now it's time to demonstrate everything altogether! Be sure that you waited long enough so that there's no pod still running on the dofferent microservices. You should have something like that:
 
 ![Scale Zero](assets/scale-zero.png)
 
-Then send a request to the App and you should see everything light-up starting with the `user-registration` component ans just after the 2 events consumers:
+Then send a request to the App and you should see erveything light-up starting with the `user-registration` component ans just after the 2 events consumers:
 
 ```sh
-$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":43}' -s | jq .
+$ curl -XPOST $APP_URL/register -H 'Content-type: application/json' -d '{"fullName":"Laurent Broudoux","email":"laurent.broudoux@gmail.com","age":41}' -s | jq .
 {
-  "age": 43,
+  "age": 41,
   "email": "laurent.broudoux@gmail.com",
   "fullName": "Laurent Broudoux",
   "id": "da4acd59-044b-4c8f-a607-3b568c7cee27",
@@ -222,13 +222,15 @@ Context Attributes,
   specversion: 1.0
   type: dev.knative.kafka.event
   source: /apis/v1/namespaces/user-registration-serverless/kafkasources/kafka-source#user-signed-up
-  subject: partition:0#2
-  id: partition:0/offset:2
-  time: 2022-03-30T09:00:16.099Z
+  subject: partition:0#3
+  id: partition:0/offset:3
+  time: 2020-11-30T15:47:12.87Z
 Extensions,
-  key: 1648630816093
+  key: 1606751232867
+  knativehistory: channel-kn-channel.user-registration-serverless.svc.cluster.local
+  traceparent: 00-2269cb19c9a73754700612cc3f3fc22d-8714cfce7963d7b4-00
 Data,
-  {"age":43,"email":"laurent.broudoux@gmail.com","fullName":"Laurent Broudoux","id":"ae63eb76-388e-4874-ade7-831f3fabb194","sendAt":"1648630816093"}
+  {"age":41,"email":"laurent.broudoux@gmail.com","fullName":"Laurent Broudoux","id":"da4acd59-044b-4c8f-a607-3b568c7cee27","sendAt":"1606751232867"}
 ```
 
 Check the logs in the `user-registration-consumer-*` pod and you should have something like:
@@ -238,14 +240,14 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-2022-03-30 09:02:21,363 INFO  [io.quarkus] (main) user-registration-consumer 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.033s. Listening on: http://0.0.0.0:8484
-2022-03-30 09:02:21,364 INFO  [io.quarkus] (main) Profile prod activated.
-2022-03-30 09:02:21,364 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, resteasy-jackson]
-2022-03-30 09:02:22,113 INFO  [org.acm.reg.UserRegistrationResource] (executor-thread-1) cloudEventJson: {"age":41,"email":"laurent.broudoux@gmail.com","fullName":"Laurent Broudoux","id":"ba7267a1-baf1-41f4-ab77-bf0adf9fbf2f","sendAt":"1648630938601"}
-2022-03-30 09:02:22,114 INFO  [org.acm.reg.UserRegistrationResource] (executor-thread-1) Processing registration {ba7267a1-baf1-41f4-ab77-bf0adf9fbf2f} for {Laurent Broudoux}
+2020-11-30 15:47:15,145 INFO  [io.quarkus] (main) user-registration-consumer 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.012s. Listening on: http://0.0.0.0:8484
+2020-11-30 15:47:15,145 INFO  [io.quarkus] (main) Profile prod activated.
+2020-11-30 15:47:15,145 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, resteasy-jackson]
+2020-11-30 15:47:15,868 INFO  [org.acm.reg.UserRegistrationResource] (executor-thread-1) cloudEventJson: {"age":41,"email":"laurent.broudoux@gmail.com","fullName":"Laurent Broudoux","id":"da4acd59-044b-4c8f-a607-3b568c7cee27","sendAt":"1606751232867"}
+2020-11-30 15:47:15,868 INFO  [org.acm.reg.UserRegistrationResource] (executor-thread-1) Processing registration {da4acd59-044b-4c8f-a607-3b568c7cee27} for {Laurent Broudoux}
 ```
 
-### Troubleshoot
+### Troubeshoot
 
 #### Check on Kafka broker
 

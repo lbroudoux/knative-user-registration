@@ -13,5 +13,5 @@ metadata:
     app.kubernetes.io/instance: channel
 spec:
   channelTemplate:
-    apiVersion: messaging.knative.dev/v1
+    apiVersion: messaging.knative.dev/v1beta1
     kind: InMemoryChannel

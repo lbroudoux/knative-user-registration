@@ -23,11 +23,9 @@ spec:
       key: {}
   sink: 
    ref:
-    apiVersion: messaging.knative.dev/v1
+    apiVersion: messaging.knative.dev/v1beta1
     kind: Channel
     name: channel
-    namespace: user-registration-serverless
     #apiVersion: serving.knative.dev/v1
     #kind: Service
     #name: event-display
-    #namespace: user-registration-serverless
